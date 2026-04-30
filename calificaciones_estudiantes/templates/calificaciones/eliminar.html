@@ -1,30 +1,304 @@
-{% extends 'registration/base.html' %}
+{% extends 'base.html' %}
 
-{% block title %}Eliminar Calificación{% endblock %}
+{% block title %}Eliminar Calificación - Sistema de Calificaciones{% endblock %}
+
+{% block extra_css %}
+<style>
+    .delete-card {
+        max-width: 600px;
+        margin: 2rem auto;
+    }
+
+    .delete-header {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        color: white;
+        border-radius: 10px 10px 0 0;
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .delete-header i {
+        font-size: 3rem;
+        margin-bottom: 0.5rem;
+        animation: shake 0.5s ease-in-out;
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
+    }
+
+    .delete-header h2 {
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .student-details {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+
+    .detail-label {
+        font-weight: 600;
+        color: #6c757d;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .detail-value {
+        font-weight: 500;
+        color: #212529;
+    }
+
+    .warning-box {
+        background-color: #fff3cd;
+        border: 2px solid #ffc107;
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1.5rem 0;
+        text-align: center;
+    }
+
+    .warning-box i {
+        font-size: 2rem;
+        color: #856404;
+        margin-bottom: 0.5rem;
+    }
+
+    .warning-box p {
+        margin: 0;
+        color: #856404;
+        font-weight: 600;
+    }
+
+    .danger-box {
+        background-color: #f8d7da;
+        border: 2px solid #dc3545;
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1.5rem 0;
+        text-align: center;
+    }
+
+    .danger-box i {
+        font-size: 1.5rem;
+        color: #721c24;
+    }
+
+    .danger-box p {
+        margin: 0.5rem 0 0 0;
+        color: #721c24;
+        font-weight: 600;
+    }
+
+    .btn-group-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+
+    .btn-delete {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        border: none;
+        font-weight: 600;
+        padding: 0.75rem 2rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-delete:hover {
+        background: linear-gradient(135deg, #c82333, #bd2130);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+    }
+
+    .btn-cancel {
+        background: #6c757d;
+        border: none;
+        font-weight: 600;
+        padding: 0.75rem 2rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-cancel:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
+    }
+
+    @media (max-width: 576px) {
+        .btn-group-actions {
+            flex-direction: column-reverse;
+        }
+
+        .btn-group-actions .btn {
+            width: 100%;
+        }
+
+        .detail-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+    }
+
+    .promedio-badge {
+        font-size: 1.2rem;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow-sm border-danger">
-                <div class="card-header bg-danger text-white">
-                    <h4 class="mb-0">Confirmar Eliminación</h4>
+<div class="delete-card">
+    <div class="card border-danger">
+        <div class="delete-header">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <h2>Confirmar Eliminación</h2>
+            <p class="mb-0 mt-2 opacity-75">Esta acción es irreversible</p>
+        </div>
+        
+        <div class="card-body p-4">
+            <div class="text-center mb-3">
+                <h5 class="text-muted">¿Estás seguro de que deseas eliminar esta calificación?</h5>
+            </div>
+
+            <!-- Detalles del estudiante -->
+            <div class="student-details">
+                <h6 class="text-center text-muted mb-3">
+                    <i class="bi bi-file-text"></i> Detalles del Registro
+                </h6>
+                
+                <div class="detail-row">
+                    <span class="detail-label">
+                        <i class="bi bi-person-fill"></i>
+                        Estudiante
+                    </span>
+                    <span class="detail-value">{{ calificacion.nombre_estudiante }}</span>
                 </div>
-                <div class="card-body text-center">
-                    <p class="fs-5">¿Estás seguro de que deseas eliminar la calificación de:</p>
-                    <p class="fw-bold fs-4">{{ calificacion.nombre_estudiante }}</p>
-                    <p class="text-muted">{{ calificacion.asignatura }} — Promedio: {{ calificacion.promedio }}</p>
-                    <p class="text-danger small">Esta acción no se puede deshacer.</p>
-                    <form method="post">
-                        {% csrf_token %}
-                        <div class="d-flex justify-content-center gap-3 mt-3">
-                            <a href="{% url 'listar_calificaciones' %}" class="btn btn-secondary">Cancelar</a>
-                            <button type="submit" class="btn btn-danger">Sí, eliminar</button>
-                        </div>
-                    </form>
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        <i class="bi bi-card-text"></i>
+                        Identificación
+                    </span>
+                    <span class="detail-value">{{ calificacion.identificacion }}</span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        <i class="bi bi-book-fill"></i>
+                        Asignatura
+                    </span>
+                    <span class="detail-value">{{ calificacion.asignatura }}</span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        <i class="bi bi-1-circle-fill"></i>
+                        Nota 1
+                    </span>
+                    <span class="detail-value">{{ calificacion.nota1 }}</span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        <i class="bi bi-2-circle-fill"></i>
+                        Nota 2
+                    </span>
+                    <span class="detail-value">{{ calificacion.nota2 }}</span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        <i class="bi bi-3-circle-fill"></i>
+                        Nota 3
+                    </span>
+                    <span class="detail-value">{{ calificacion.nota3 }}</span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">
+                        <i class="bi bi-calculator-fill"></i>
+                        Promedio
+                    </span>
+                    <span class="detail-value">
+                        <span class="badge promedio-badge {% if calificacion.promedio >= 3.5 %}bg-success{% elif calificacion.promedio >= 3.0 %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                            {{ calificacion.promedio }}
+                        </span>
+                    </span>
                 </div>
             </div>
+
+            <!-- Advertencia -->
+            <div class="warning-box">
+                <i class="bi bi-exclamation-circle-fill"></i>
+                <p>Revisa cuidadosamente la información antes de continuar</p>
+            </div>
+
+            <!-- Mensaje de peligro -->
+            <div class="danger-box">
+                <i class="bi bi-shield-fill-exclamation"></i>
+                <p>Esta acción no se puede deshacer. El registro será eliminado permanentemente.</p>
+            </div>
+
+            <!-- Formulario de confirmación -->
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="btn-group-actions">
+                    <a href="{% url 'listar_calificaciones' %}" class="btn btn-cancel btn-lg">
+                        <i class="bi bi-arrow-left-circle"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-delete btn-lg text-white">
+                        <i class="bi bi-trash-fill"></i> Sí, Eliminar Definitivamente
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Agregar confirmación adicional al hacer clic en eliminar
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const confirmDelete = confirm('⚠️ ÚLTIMA ADVERTENCIA\n\n¿Realmente deseas eliminar esta calificación?\n\nEsta acción es IRREVERSIBLE.');
+        
+        if (!confirmDelete) {
+            e.preventDefault();
+        }
+    });
+
+    // Animación de entrada
+    document.addEventListener('DOMContentLoaded', function() {
+        const card = document.querySelector('.delete-card');
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(-20px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'all 0.5s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, 100);
+    });
+</script>
 {% endblock %}
