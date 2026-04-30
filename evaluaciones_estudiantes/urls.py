@@ -11,8 +11,10 @@ from django.shortcuts import redirect
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # Rutas de autenticación
+    # Rutas de autenticación (login, logout, registro)
     path('', include('calificaciones_estudiantes.urls')),
+    # Rutas del CRUD de calificaciones bajo el prefijo /calificaciones/
+    path('calificaciones/', include('calificaciones_estudiantes.urls')),
     # Redirección raíz al login
     path('', lambda request: redirect('login'), name='home'),
 ]
