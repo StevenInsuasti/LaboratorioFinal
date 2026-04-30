@@ -1,0 +1,57 @@
+{% extends 'registration/base.html' %}
+
+{% block title %}Listado de Calificaciones{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Calificaciones</h2>
+        <div>
+            <a href="{% url 'crear_calificacion' %}" class="btn btn-primary">+ Nueva Calificación</a>
+            <a href="{% url 'logout' %}" class="btn btn-outline-secondary ms-2">Cerrar sesión</a>
+        </div>
+    </div>
+
+    {% if calificaciones %}
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Estudiante</th>
+                    <th>Identificación</th>
+                    <th>Asignatura</th>
+                    <th class="text-center">Nota 1</th>
+                    <th class="text-center">Nota 2</th>
+                    <th class="text-center">Nota 3</th>
+                    <th class="text-center">Promedio</th>
+                    <th class="text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cal in calificaciones %}
+                <tr>
+                    <td>{{ cal.nombre_estudiante }}</td>
+                    <td>{{ cal.identificacion }}</td>
+                    <td>{{ cal.asignatura }}</td>
+                    <td class="text-center">{{ cal.nota1 }}</td>
+                    <td class="text-center">{{ cal.nota2 }}</td>
+                    <td class="text-center">{{ cal.nota3 }}</td>
+                    <td class="text-center">
+                        <span class="badge {% if cal.promedio >= 3 %}bg-success{% else %}bg-danger{% endif %} fs-6">
+                            {{ cal.promedio }}
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <a href="{% url 'editar_calificacion' cal.id %}" class="btn btn-sm btn-warning">Editar</a>
+                        <a href="{% url 'eliminar_calificacion' cal.id %}" class="btn btn-sm btn-danger ms-1">Eliminar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info">No hay calificaciones registradas aún.</div>
+    {% endif %}
+</div>
+{% endblock %}
