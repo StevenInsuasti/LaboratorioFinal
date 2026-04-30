@@ -1,0 +1,408 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Calificación - Sistema de Calificaciones{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-card {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .form-header {
+        background: linear-gradient(135deg, #ffc107, #ff9800);
+        color: #212529;
+        border-radius: 10px 10px 0 0;
+        padding: 1.5rem;
+    }
+
+    .form-header h2 {
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .form-header i {
+        font-size: 2rem;
+        margin-right: 10px;
+    }
+
+    .student-info-card {
+        background: linear-gradient(135deg, #fff3cd, #ffe69c);
+        border-left: 4px solid #ffc107;
+        padding: 1rem;
+        border-radius: 6px;
+        margin-bottom: 1.5rem;
+    }
+
+    .student-info-card h5 {
+        margin: 0 0 0.5rem 0;
+        color: #856404;
+    }
+
+    .student-info-card p {
+        margin: 0;
+        color: #856404;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control:focus {
+        border-color: #ffc107;
+        box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+    }
+
+    .required-field::after {
+        content: " *";
+        color: #dc3545;
+    }
+
+    .btn-group-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: space-between;
+        margin-top: 2rem;
+    }
+
+    @media (max-width: 576px) {
+        .btn-group-actions {
+            flex-direction: column;
+        }
+
+        .btn-group-actions .btn {
+            width: 100%;
+        }
+    }
+
+    .info-box {
+        background-color: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 1rem;
+        border-radius: 6px;
+        margin-bottom: 1.5rem;
+        color: #856404;
+    }
+
+    .notas-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .current-promedio {
+        background: #e7f3ff;
+        border: 2px solid #1a73e8;
+        border-radius: 8px;
+        padding: 1rem;
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .current-promedio .value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1a73e8;
+    }
+
+    .current-promedio .label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-card">
+    <div class="card">
+        <div class="form-header">
+            <h2>
+                <i class="bi bi-pencil-square"></i>
+                Editar Calificación
+            </h2>
+            <p class="mb-0 mt-2 opacity-75">Actualiza la información del estudiante</p>
+        </div>
+        
+        <div class="card-body p-4">
+            <!-- Información del estudiante actual -->
+            <div class="student-info-card">
+                <h5>
+                    <i class="bi bi-info-circle-fill"></i> 
+                    Editando calificación de: <strong>{{ calificacion.nombre_estudiante }}</strong>
+                </h5>
+                <p>
+                    <i class="bi bi-card-text"></i> ID: {{ calificacion.identificacion }} | 
+                    <i class="bi bi-book"></i> Asignatura: {{ calificacion.asignatura }}
+                </p>
+            </div>
+
+            <!-- Promedio actual -->
+            <div class="current-promedio">
+                <div class="label">
+                    <i class="bi bi-calculator"></i> Promedio Actual
+                </div>
+                <div class="value">{{ calificacion.promedio }}</div>
+                <small class="text-muted">Se recalculará automáticamente al guardar</small>
+            </div>
+
+            <div class="info-box">
+                <i class="bi bi-exclamation-circle-fill"></i>
+                <strong>Nota:</strong> Al modificar las notas, el promedio se recalculará automáticamente.
+                Las notas deben estar en el rango de 0.00 a 5.00.
+            </div>
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                <!-- Información del Estudiante -->
+                <div class="mb-4">
+                    <h5 class="text-muted border-bottom pb-2">
+                        <i class="bi bi-person-fill"></i> Información del Estudiante
+                    </h5>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.nombre_estudiante.id_for_label }}" class="form-label required-field">
+                                {{ form.nombre_estudiante.label }}
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-person"></i>
+                                </span>
+                                <input
+                                    type="text"
+                                    name="{{ form.nombre_estudiante.html_name }}"
+                                    id="{{ form.nombre_estudiante.id_for_label }}"
+                                    class="form-control {% if form.nombre_estudiante.errors %}is-invalid{% endif %}"
+                                    placeholder="Nombre completo del estudiante"
+                                    value="{{ form.nombre_estudiante.value|default:'' }}"
+                                    required
+                                    maxlength="150"
+                                >
+                                {% if form.nombre_estudiante.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.nombre_estudiante.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.identificacion.id_for_label }}" class="form-label required-field">
+                                {{ form.identificacion.label }}
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-card-text"></i>
+                                </span>
+                                <input
+                                    type="text"
+                                    name="{{ form.identificacion.html_name }}"
+                                    id="{{ form.identificacion.id_for_label }}"
+                                    class="form-control {% if form.identificacion.errors %}is-invalid{% endif %}"
+                                    placeholder="Número de identificación"
+                                    value="{{ form.identificacion.value|default:'' }}"
+                                    required
+                                    maxlength="15"
+                                >
+                                {% if form.identificacion.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.identificacion.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.asignatura.id_for_label }}" class="form-label required-field">
+                            {{ form.asignatura.label }}
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-book"></i>
+                            </span>
+                            <input
+                                type="text"
+                                name="{{ form.asignatura.html_name }}"
+                                id="{{ form.asignatura.id_for_label }}"
+                                class="form-control {% if form.asignatura.errors %}is-invalid{% endif %}"
+                                placeholder="Nombre de la asignatura"
+                                value="{{ form.asignatura.value|default:'' }}"
+                                required
+                                maxlength="100"
+                            >
+                            {% if form.asignatura.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.asignatura.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calificaciones -->
+                <div class="mb-4">
+                    <h5 class="text-muted border-bottom pb-2">
+                        <i class="bi bi-clipboard-data-fill"></i> Calificaciones
+                    </h5>
+                    
+                    <div class="notas-grid">
+                        <div class="mb-3">
+                            <label for="{{ form.nota1.id_for_label }}" class="form-label required-field">
+                                {{ form.nota1.label }}
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-1-circle-fill"></i>
+                                </span>
+                                <input
+                                    type="number"
+                                    name="{{ form.nota1.html_name }}"
+                                    id="{{ form.nota1.id_for_label }}"
+                                    class="form-control {% if form.nota1.errors %}is-invalid{% endif %}"
+                                    placeholder="0.00 - 5.00"
+                                    value="{{ form.nota1.value|default:'' }}"
+                                    step="0.01"
+                                    min="0"
+                                    max="5"
+                                    required
+                                >
+                                {% if form.nota1.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.nota1.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.nota2.id_for_label }}" class="form-label required-field">
+                                {{ form.nota2.label }}
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-2-circle-fill"></i>
+                                </span>
+                                <input
+                                    type="number"
+                                    name="{{ form.nota2.html_name }}"
+                                    id="{{ form.nota2.id_for_label }}"
+                                    class="form-control {% if form.nota2.errors %}is-invalid{% endif %}"
+                                    placeholder="0.00 - 5.00"
+                                    value="{{ form.nota2.value|default:'' }}"
+                                    step="0.01"
+                                    min="0"
+                                    max="5"
+                                    required
+                                >
+                                {% if form.nota2.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.nota2.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.nota3.id_for_label }}" class="form-label required-field">
+                                {{ form.nota3.label }}
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-3-circle-fill"></i>
+                                </span>
+                                <input
+                                    type="number"
+                                    name="{{ form.nota3.html_name }}"
+                                    id="{{ form.nota3.id_for_label }}"
+                                    class="form-control {% if form.nota3.errors %}is-invalid{% endif %}"
+                                    placeholder="0.00 - 5.00"
+                                    value="{{ form.nota3.value|default:'' }}"
+                                    step="0.01"
+                                    min="0"
+                                    max="5"
+                                    required
+                                >
+                                {% if form.nota3.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.nota3.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Errores generales del formulario -->
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                            <i class="bi bi-exclamation-triangle-fill"></i> {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- Botones de acción -->
+                <div class="btn-group-actions">
+                    <a href="{% url 'listar_calificaciones' %}" class="btn btn-secondary btn-lg">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-warning btn-lg">
+                        <i class="bi bi-check-circle"></i> Actualizar Calificación
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Calcular promedio en tiempo real (preview)
+    document.addEventListener('DOMContentLoaded', function() {
+        const nota1Input = document.getElementById('{{ form.nota1.id_for_label }}');
+        const nota2Input = document.getElementById('{{ form.nota2.id_for_label }}');
+        const nota3Input = document.getElementById('{{ form.nota3.id_for_label }}');
+        const promedioDisplay = document.querySelector('.current-promedio .value');
+
+        function calcularPromedio() {
+            const nota1 = parseFloat(nota1Input.value) || 0;
+            const nota2 = parseFloat(nota2Input.value) || 0;
+            const nota3 = parseFloat(nota3Input.value) || 0;
+            const promedio = ((nota1 + nota2 + nota3) / 3).toFixed(2);
+            promedioDisplay.textContent = promedio;
+            
+            // Cambiar color según el promedio
+            if (promedio >= 3.5) {
+                promedioDisplay.style.color = '#28a745';
+            } else if (promedio >= 3.0) {
+                promedioDisplay.style.color = '#ffc107';
+            } else {
+                promedioDisplay.style.color = '#dc3545';
+            }
+        }
+
+        nota1Input.addEventListener('input', calcularPromedio);
+        nota2Input.addEventListener('input', calcularPromedio);
+        nota3Input.addEventListener('input', calcularPromedio);
+    });
+</script>
+{% endblock %}
