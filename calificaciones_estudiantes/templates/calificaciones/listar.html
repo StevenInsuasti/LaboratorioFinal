@@ -218,8 +218,9 @@
         <div class="col-md-4 mb-3">
             <div class="stats-card">
                 <h4><i class="bi bi-graph-up"></i> Promedio General</h4>
-                <div class="number text-muted">--</div>
-                <small class="text-muted">(Calculado por Hector)</small>
+                <div class="number {% if promedio_general %}text-primary{% else %}text-muted{% endif %}">
+                    {% if promedio_general %}{{ promedio_general }}{% else %}--{% endif %}
+                </div>
             </div>
         </div>
     </div>
@@ -281,15 +282,15 @@
         </div>
     </div>
 
-    <!-- Sección para promedio general - Hector la completará -->
+    <!-- Sección de promedio general -->
     <div id="promedio-general-section">
-        <div class="promedio-placeholder">
-            <i class="bi bi-calculator-fill"></i>
-            <h5>Sección de Promedio General</h5>
-            <p class="mb-0">
-                <strong>Nota para Hector:</strong> Esta sección está reservada para mostrar el promedio general 
-                de todas las calificaciones usando la función agregada Avg de Django.
-            </p>
+        <div class="alert alert-info mt-3 w-100 mb-0">
+            <h4><i class="bi bi-calculator-fill"></i> Promedio General de Todos los Estudiantes</h4>
+            {% if promedio_general %}
+                <p class="h3 mb-0">{{ promedio_general|floatformat:2 }}</p>
+            {% else %}
+                <p class="mb-0">No hay calificaciones registradas para calcular promedio.</p>
+            {% endif %}
         </div>
     </div>
 

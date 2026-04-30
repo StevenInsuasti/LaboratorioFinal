@@ -2,7 +2,8 @@
 Vistas de la aplicación calificaciones_estudiantes.
 
 Incluye autenticación (registro, login, logout) y CRUD completo
-para la gestión de calificaciones de estudiantes.
+para la gestión de calificaciones de estudiantes, además del
+cálculo del promedio general mediante función agregada de Django.
 """
 
 from django.shortcuts import render, redirect, get_object_or_404
@@ -10,6 +11,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db.models import Avg
 from .forms import RegistroUsuarioForm, CalificacionForm
 from .models import Calificacion
 
@@ -113,15 +115,43 @@ def listar_calificaciones(request):
     """
     Vista para mostrar todas las calificaciones registradas.
 
-    Obtiene todos los registros ordenados según el Meta del modelo.
+    Obtiene todos los registros ordenados según el Meta del modelo
+    e incluye el promedio general calculado con la función agregada Avg.
     """
     try:
         calificaciones = Calificacion.objects.all()
+        resultado = Calificacion.objects.all().aggregate(Avg('promedio'))
+        promedio_general = resultado['promedio__avg']
+        if promedio_general is not None:
+            promedio_general = round(promedio_general, 2)
     except Exception as e:
         messages.error(request, f'Error al obtener las calificaciones: {e}')
         calificaciones = []
+        promedio_general = None
 
-    return render(request, 'calificaciones/listar.html', {'calificaciones': calificaciones})
+    return render(request, 'calificaciones/listar.html', {
+        'calificaciones': calificaciones,
+        'promedio_general': promedio_general,
+    })
+
+
+@login_required
+def promedio_general(request):
+    """
+    Vista dedicada para mostrar el promedio general de todos los estudiantes.
+
+    Calcula el promedio usando la función agregada Avg de Django sobre
+    el campo 'promedio' del modelo Calificacion.
+    """
+    resultado = Calificacion.objects.all().aggregate(Avg('promedio'))
+    prom = resultado['promedio__avg']
+    if prom is not None:
+        prom = round(prom, 2)
+
+    return render(request, 'calificaciones/listar.html', {
+        'calificaciones': Calificacion.objects.all(),
+        'promedio_general': prom,
+    })
 
 
 @login_required
